@@ -7,7 +7,7 @@ typedef struct
 	int num;
 	char name[10];
 	int score;
-};
+}ElemType;
 typedef int Status;
 
 typedef struct LNode {
@@ -19,6 +19,22 @@ Status Initlist(LinkList& L)
 {
 	L = new LNode;
 	L->next = NULL;
+	return OK;
+}
+
+Status CreatList(LinkList& L, int n)
+{
+	LNode* r, * p;
+	r = L;
+	cout << "请输入" << n << "个学生信息" << endl;
+	for (int i = 0; i < n; i++)
+	{
+		p = new LNode;
+		cin >> p->data.num >> p->data.name >> p->data.score;
+		p->next = NULL;
+		r->next = p;
+		r = p;
+	}
 	return OK;
 }
 
@@ -38,7 +54,7 @@ Status GetElem(LinkList L, int i, ElemType& e)
 LNode* LocateElemtype(LinkList L, ElemType e)
 {
 	LNode* p = L->next;
-	while (p && p->data != e)
+	while (p && p->data.num != e.num)
 	{
 		p = p->next;
 	}
@@ -125,10 +141,10 @@ void DisplayList(LinkList L)
 	}
 
 	LinkList p = L->next;
-	cout << "线性表内容：";
+	cout << "班级全部信息为：";
 	while (p)
 	{
-		cout << p->data << " ";
+		cout << p->data.num << " " << p->data.name << " " << p->data.score << endl;
 		p = p->next;
 	}
 	cout << endl;
@@ -137,9 +153,11 @@ void DisplayList(LinkList L)
 int main()
 {
 	LinkList L;
+	int a;
+	ElemType e;
 	cout << "1.创建班级" << endl;
 	cout << "2.输入学生基本信息" << endl;
-	cout << "3.按位序查找学生" << endl;
+	cout << "3.按学号查找学生" << endl;
 	cout << "4.输出班级学生全部信息" << endl;
 	cout << "5.插入新学生" << endl;
 	cout << "6.删除离班学生" << endl;
@@ -164,7 +182,26 @@ int main()
 			break;
 
 		case 3:
+			cout << "输入一个学号用于查找：";
+			cin>>e.num;
+			if (LocateElemtype(L, a))cout << "成功查找 学号"<<" " << e.num << "的学生是" << " " << e.name << endl;
+			else cout << "查找失败" << endl;
+			break;
 
+		case 4:
+			
+				break;
+		case 5:
+			cout << "请输入插入学生的位置以及学生信息:";
+			cin >> a >> e.num >> e.score;
+			if (ListInsert(L, a, e))cout << "插入成功" << endl;
+			else cout << "插入失败" << endl;
+			break;
+		case 6:
+			cout << "请输入删除学生的位序：";
+			cin >> a;
+			if (ListDelete(L, a))cout << "删除成功 被删除的学生是：" << e.name << endl;
+			else cout << "删除失败" << endl;
 			break;
 		}
 	}
