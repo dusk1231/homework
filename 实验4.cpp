@@ -22,9 +22,7 @@ LinkedStack Init_LinkedStack()
 
 Status LinkedStack_Empty(LinkedStack top)
 {
-    if (top->next == NULL)
-    {
-        return OK;
+    return (top->next == nullptr) ? OK : 0;
     }
     else
     {
