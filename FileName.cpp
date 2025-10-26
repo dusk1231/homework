@@ -1,5 +1,6 @@
 #include<iostream>
 #include<cstring>
+#include<iomanip>
 using namespace std;
 #define OK 1
 #define ERROR 0
@@ -25,12 +26,13 @@ Status Initlist(LinkList& L)
 
 Status CreatList(LinkList& L, int n)
 {
-	LNode* r, * p;
-	r = L;
+	if (!L) Initlist(L);
+	LNode* r = L;
+	while (r->next) r = r->next;
 	cout << "请输入" << n << "个学生信息 (学号 姓名 分数)" << endl;
 	for (int i = 0; i < n; i++)
 	{
-		p = new LNode;
+		LNode* p = new LNode;
 		cin >> p->data.num >> p->data.name >> p->data.score;
 		p->next = NULL;
 		r->next = p;
@@ -107,8 +109,7 @@ Status ListDelete(LinkList& L, int i)
 
 void CreateList_B(LinkList& L, int n)
 {
-	L = new LNode;
-	L->next = NULL;
+	if (!L) Initlist(L);
 	for (int i = 0; i < n; i++)
 	{
 		LNode* p = new LNode;
@@ -120,9 +121,9 @@ void CreateList_B(LinkList& L, int n)
 
 void CreateList_F(LinkList& L, int n)
 {
-	L = new LNode;
-	L->next = NULL;
+	if (!L) Initlist(L);
 	LNode* r = L;
+	while (r->next) r = r->next;
 	for (int i = 0; i < n; i++)
 	{
 		LNode* p = new LNode;
@@ -135,6 +136,7 @@ void CreateList_F(LinkList& L, int n)
 
 Status ListEmpty(LinkList L)
 {
+	if (!L) return OK;
 	return (L->next == NULL) ? OK : ERROR;
 }
 
@@ -156,84 +158,214 @@ void DisplayList(LinkList L)
 	cout << endl;
 }
 
-int main()
+// 追加学生（尾插），若链表未初始化则初始化
+void AppendStudent(LinkList& L, int num, const char* name, int score)
+{
+	if (!L) Initlist(L);
+	LNode* r = L;
+	while (r->next) r = r->next;
+	LNode* p = new LNode;
+	p->data.num = num;
+	strncpy_s(p->data.name, name, sizeof(p->data.name) - 1);
+	p->data.name[sizeof(p->data.name) - 1] = '\0';
+	p->data.score = score;
+	p->next = NULL;
+	r->next = p;
+}
+
+// 通过学号删除学生，返回 OK/ERROR；deleted 返回被删除的数据（若删除成功）
+Status DeleteByNum(LinkList& L, int num, ElemType& deleted)
+{
+	if (!L) return ERROR;
+	LNode* prev = L;
+	while (prev->next && prev->next->data.num != num)
+		prev = prev->next;
+	if (!prev->next) return ERROR;
+	LNode* target = prev->next;
+	deleted = target->data;
+	prev->next = target->next;
+	delete target;
+	return OK;
+}
+
+// 根据学号为学生增加经验值（delta 可正可负），返回 OK/ERROR，outScore 返回新经验值
+Status ChangeExperience(LinkList L, int num, int delta, int& outScore)
+{
+	LNode* p = LocateElemtype(L, num);
+	if (!p) return ERROR;
+	p->data.score += delta;
+	outScore = p->data.score;
+	return OK;
+}
+
+// 按姓名查找学生经验值（返回第一个匹配），若找到返回 OK 并输出 score
+Status FindByName(LinkList L, const char* name, int& outScore, int& outNum)
+{
+	if (!L) return ERROR;
+	LNode* p = L->next;
+	while (p)
+	{
+		if (strcmp(p->data.name, name) == 0)
+		{
+			outScore = p->data.score;
+			outNum = p->data.num;
+			return OK;
+		}
+		p = p->next;
+	}
+	return ERROR;
+}
+
+// 求经验值最高的学生信息
+Status MaxExperience(LinkList L, ElemType& out)
+{
+	if (!L || ListEmpty(L) == OK) return ERROR;
+	LNode* p = L->next;
+	LNode* maxNode = p;
+	while (p)
+	{
+		if (p->data.score > maxNode->data.score) maxNode = p;
+		p = p->next;
+	}
+	out = maxNode->data;
+	return OK;
+}
+
+/*int main()
 {
 	LinkList L = NULL;
-	int a;
-	ElemType e;
-	cout << "1.创建班级" << endl;
-	cout << "2.输入学生基本信息(学号 姓名 分数)" << endl;
-	cout << "3.按学号查找学生" << endl;
-	cout << "4.输出班级学生全部信息" << endl;
-	cout << "5.插入新学生" << endl;
-	cout << "6.删除离班学生" << endl;
-	cout << "6.为某学号学生增加指定分数" << endl;
-	cout << "7.为某学号学生扣减指定分数" << endl;
-	cout << "0.退出" << endl;
+	// 打印题目说明与菜单头（按要求格式）
+	cout << "设计一个最少包含学生学号、姓名、经验值等信息的顺序表或单链表，设计一个如下所示功能的程序：" << endl;
+	cout << "课堂经验值管理小程序" << endl;
+	cout << "*********************************************" << endl;
+	cout << "* 1------插入学生                           *" << endl;
+	cout << "* 2------删除学生                           *" << endl;
+	cout << "* 3------为某学号学生加指定经验值           *" << endl;
+	cout << "* 4------为某学号学生减指定经验值           *" << endl;
+	cout << "* 5------按姓名查找学生经验值               *" << endl;
+	cout << "* 6------求经验值最高的学生信息             *" << endl;
+	cout << "*********************************************" << endl;
+	cout << endl;
+
+	// 初始化内置学生名单并输出（按要求）
+	AppendStudent(L, 100, "张三", 1000);
+	AppendStudent(L, 101, "李四", 1100);
+	AppendStudent(L, 102, "王五", 1200);
+	AppendStudent(L, 103, "赵六", 1300);
+	AppendStudent(L, 104, "钱七", 1400);
+
+	cout << "并初始化内置以下学生名单数据：" << endl;
+	cout << "学号    姓名    当前经验值" << endl;
+	LinkList p = L->next;
+	while (p)
+	{
+		cout << setw(6) << p->data.num << " " << setw(6) << p->data.name << " " << setw(8) << p->data.score << endl;
+		p = p->next;
+	}
+	cout << endl;
+	cout << "【输入】 功能编号 相关参数" << endl;
+	cout << "【输出】 正确执行对应功能后的结果显示 或 某某失败（如：插入失败、删除失败、加经验值失败、减经验值失败、查找失败、求最高经验值失败）" << endl;
+	cout << endl;
 
 	int choose = -1;
 	while (choose != 0)
 	{
-		cout << "请选择操作：";
+		cout << "请输入功能编号：";
 		cin >> choose;
 		switch (choose)
 		{
 		case 1:
-			if (Initlist(L))cout << "成功建立班级" << endl;
-			else cout << "创建班级失败" << endl;
+		{
+			// 插入学生：位置(1-based，0 表示尾插) 学号 姓名 经验值
+			int pos; ElemType ne;
+			cout << "输入：位置(1表示第1个，0表示尾插) 学号 姓名 经验值：";
+			cin >> pos >> ne.num >> ne.name >> ne.score;
+			if (pos == 0)
+			{
+				AppendStudent(L, ne.num, ne.name, ne.score);
+				cout << "插入成功（尾插） 学号：" << ne.num << " 姓名：" << ne.name << " 经验值：" << ne.score << endl;
+			}
+			else
+			{
+				if (ListInsert(L, pos, ne))
+					cout << "插入成功 学号：" << ne.num << " 姓名：" << ne.name << " 经验值：" << ne.score << endl;
+				else
+					cout << "插入失败" << endl;
+			}
 			break;
-
+		}
 		case 2:
 		{
-			if (!L) { Initlist(L); }
-			cout << "请输入要录入的学生人数：";
-			int n; cin >> n;
-			cout << "选择录入方式：1-尾插 2-头插 (默认尾插)：";
-			int m; cin >> m;
-			if (m == 2) CreateList_B(L, n);
-			else CreateList_F(L, n);
-			cout << "录入完成。" << endl;
+			// 删除学生：按学号删除
+			int num;
+			cout << "输入：要删除学生的学号：";
+			cin >> num;
+			ElemType deleted;
+			if (DeleteByNum(L, num, deleted))
+			{
+				cout << "删除成功 被删除的学生是：学号 " << deleted.num << " 姓名 " << deleted.name << " 经验值 " << deleted.score << endl;
+			}
+			else
+			{
+				cout << "删除失败" << endl;
+			}
 			break;
 		}
-
 		case 3:
 		{
-			if (!L) { cout << "请先创建班级（选项1）" << endl; break; }
-			cout << "输入一个学号用于查找：";
-			int num; cin >> num;
-			LNode* found = LocateElemtype(L, num);
-			if (found) cout << "成功查找 学号 " << found->data.num << " 的学生是 " << found->data.name << " 分数：" << found->data.score << endl;
-			else cout << "查找失败" << endl;
+			// 加经验值：学号 增加值
+			int num, delta;
+			cout << "输入：学号 增加经验值：";
+			cin >> num >> delta;
+			int newScore;
+			if (ChangeExperience(L, num, delta, newScore))
+				cout << "加经验值成功 学号：" << num << " 新经验值：" << newScore << endl;
+			else
+				cout << "加经验值失败" << endl;
 			break;
 		}
-
 		case 4:
-			DisplayList(L);
+		{
+			// 减经验值：学号 减少值
+			int num, delta;
+			cout << "输入：学号 减少经验值：";
+			cin >> num >> delta;
+			int newScore;
+			if (ChangeExperience(L, num, -delta, newScore))
+				cout << "减经验值成功 学号：" << num << " 新经验值：" << newScore << endl;
+			else
+				cout << "减经验值失败" << endl;
 			break;
+		}
 		case 5:
 		{
-			if (!L) { cout << "请先创建班级（选项1）" << endl; break; }
-			cout << "请输入插入学生的位置以及学生信息(学号 姓名 分数):";
-			int pos; ElemType ne;
-			cin >> pos >> ne.num >> ne.name >> ne.score;
-			if (ListInsert(L, pos, ne))cout << "插入成功" << endl;
-			else cout << "插入失败" << endl;
+			// 按姓名查找经验值
+			char name[20];
+			cout << "输入：姓名（查找第一个匹配）：";
+			cin >> name;
+			int score, num;
+			if (FindByName(L, name, score, num))
+				cout << "查找成功 学号：" << num << " 姓名：" << name << " 当前经验值：" << score << endl;
+			else
+				cout << "查找失败" << endl;
 			break;
 		}
 		case 6:
 		{
-			if (!L) { cout << "请先创建班级（选项1）" << endl; break; }
-			cout << "请输入删除学生的位序：";
-			cin >> a;
-			ElemType del;
-			if (GetElem(L, a, del) && ListDelete(L, a)) cout << "删除成功 被删除的学生是：" << del.name << " 学号：" << del.num << " 分数：" << del.score << endl;
-			else cout << "删除失败" << endl;
+			ElemType top;
+			if (MaxExperience(L, top))
+				cout << "经验值最高的学生：学号 " << top.num << " 姓名 " << top.name << " 经验值 " << top.score << endl;
+			else
+				cout << "求最高经验值失败" << endl;
 			break;
 		}
+		case 0:
+			cout << "退出程序。" << endl;
+			break;
 		default:
-			if (choose != 0) cout << "无效选项" << endl;
+			cout << "无效选项" << endl;
 			break;
 		}
 	}
 	return 0;
-}
+}*/
