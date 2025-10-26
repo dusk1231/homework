@@ -25,6 +25,7 @@ Status LinkedStack_Empty(LinkedStack top)
 {
     return (top->next == nullptr) ? OK : 0;
 }
+
 Status Push_LinkedStack(LinkedStack Top, Elemtype Num, const char* Name, Elemtype EXE)
 {
     LinkedStackNode* Node = new (std::nothrow) LinkedStackNode;
@@ -39,6 +40,7 @@ Status Push_LinkedStack(LinkedStack Top, Elemtype Num, const char* Name, Elemtyp
     Top->next = Node;
     return OK;
 }
+
 Status Pop_LinkedStack(LinkedStack Top, Elemtype* Num, const char** Name, Elemtype* EXE)
 {
     if (LinkedStack_Empty(Top) == OK)
@@ -53,6 +55,22 @@ Status Pop_LinkedStack(LinkedStack Top, Elemtype* Num, const char** Name, Elemty
     delete Node;
     return OK;
 }
+
+Status Undo_LinkedStack(LinkedStack mainStack, LinkedStack historyStack)
+{
+    if (LinkedStack_Empty(mainStack) == OK || LinkedStack_Empty(historyStack) == OK)
+    {
+        return ERROR;
+    }
+    Elemtype tempNum;
+    const char* tempName;
+    Elemtype tempExe;
+    Pop_LinkedStack(mainStack, &tempNum, &tempName, &tempExe);
+    Pop_LinkedStack(historyStack, &tempNum, &tempName, &tempExe);
+
+    return OK;
+}
+
 int main()
 {
     LinkedStack S = Init_LinkedStack();
@@ -80,6 +98,24 @@ int main()
 
     Pop_LinkedStack(S, &num, &name, &exe);
     cout << num << " " << name << " " << exe << endl;
+
+    cout << "1.为某学号学生加指定经验值" << endl;
+    cout << "2.为某学号学生减指定经验值" << endl;
+    cout << "3.撤揄加减经验值的错误操作" << endl;
+
+    int choose = -1;
+    while(choose!=0)
+    {
+        cout << "请选择进行的操作：";
+        switch (choose)
+        {
+        case 1:
+
+            break;
+        }
+    }
+        
+
 
     return 0;
 }
