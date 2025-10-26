@@ -1,5 +1,6 @@
 #include<iostream>
 using namespace std;
+
 #define OK 1
 #define ERROR -1
 
@@ -10,12 +11,12 @@ typedef struct LinkedStackNode
     Elemtype Num;
     const char* Name;
     Elemtype EXE;
-    struct LinkedStackNode* next;//指向 LinkedStackNode 结构体的指针
+    struct LinkedStackNode* next;
 }LinkedStackNode, * LinkedStack;
 
 LinkedStack Init_LinkedStack()
 {
-    LinkedStack Top = new LinkedStackNode(); // 为头结点分配节点大小的内存
+    LinkedStack Top = new LinkedStackNode();
     Top->next = nullptr;
     return Top;
 }
@@ -23,73 +24,62 @@ LinkedStack Init_LinkedStack()
 Status LinkedStack_Empty(LinkedStack top)
 {
     return (top->next == nullptr) ? OK : 0;
-    }
-    else
-    {
-        return 0;
-    }
 }
-
 Status Push_LinkedStack(LinkedStack Top, Elemtype Num, const char* Name, Elemtype EXE)
 {
-    LinkedStackNode* Node;
-    Node = new (std::nothrow) LinkedStackNode;
-
-    if (Top->next == nullptr)
-    {
-        return ERROR;
-    }
-
+    LinkedStackNode* Node = new (std::nothrow) LinkedStackNode;
     if (!Node)
     {
         return ERROR;
     }
-    else
-    {
-        Node->Num = Num;
-        Node->Name = Name;
-        Node->EXE = EXE;
-        Node->next = Top->next;
-        Top->next = Node;
-        return OK;
-    }
+    Node->Num = Num;
+    Node->Name = Name;
+    Node->EXE = EXE;
+    Node->next = Top->next;
+    Top->next = Node;
+    return OK;
 }
-
-Status Pop_LinkedStack(LinkedStack Top, Elemtype *Num, const char**Name, Elemtype *EXE)
+Status Pop_LinkedStack(LinkedStack Top, Elemtype* Num, const char** Name, Elemtype* EXE)
 {
-    LinkedStackNode* Node;
-    if (LinkedStack_Empty(Top)==OK)
+    if (LinkedStack_Empty(Top) == OK)
     {
         return ERROR;
     }
-    else
-    {
-        Node = Top->next;
-        *Num = Node->Num;
-        *Name = Node->Name;
-        *EXE = Node->EXE;
-        Top->next = Node->next;
-        delete Node;
-        return OK;
-    }
+    LinkedStackNode* Node = Top->next;
+    *Num = Node->Num;
+    *Name = Node->Name;
+    *EXE = Node->EXE;
+    Top->next = Node->next;
+    delete Node;
+    return OK;
 }
-
 int main()
 {
     LinkedStack S = Init_LinkedStack();
-    Push_LinkedStack(S, 100, "张三", 1000);
-    Push_LinkedStack(S, 101, "李四", 1100);
-    Push_LinkedStack(S, 102, "王五", 1200);
-    Push_LinkedStack(S, 103, "赵六", 1300);
     Push_LinkedStack(S, 104, "钱七", 1400);
+    Push_LinkedStack(S, 103, "赵六", 1300);
+    Push_LinkedStack(S, 102, "王五", 1200);
+    Push_LinkedStack(S, 101, "李四", 1100);
+    Push_LinkedStack(S, 100, "张三", 1000);
 
-    Elemtype Num;
-    const char* Name;
-    Elemtype EXE;
+    Elemtype num;
+    const char* name;
+    Elemtype exe;
 
-    Pop_LinkedStack(S, &Num, &Name, &EXE); cout << Num << " " << Name << " " << EXE << endl;
-    Pop_LinkedStack(S, &Num, &Name, &EXE); cout << Num << " " << Name << " " << EXE << endl;
-    Pop_LinkedStack(S, &Num, &Name, &EXE); cout << Num << " " << Name << " " << EXE << endl;
-    Pop_LinkedStack(S, &Num, &Name, &EXE); cout << Num << " " << Name << " " << EXE << endl;
-    Pop_LinkedStack(S, &Num, &Name, &EXE); cout << Num << " " << Name << " " << EXE << endl;
+    Pop_LinkedStack(S, &num, &name, &exe);
+    cout << num << " " << name << " " << exe << endl;
+
+    Pop_LinkedStack(S, &num, &name, &exe);
+    cout << num << " " << name << " " << exe << endl;
+
+    Pop_LinkedStack(S, &num, &name, &exe);
+    cout << num << " " << name << " " << exe << endl;
+
+    Pop_LinkedStack(S, &num, &name, &exe);
+    cout << num << " " << name << " " << exe << endl;
+
+    Pop_LinkedStack(S, &num, &name, &exe);
+    cout << num << " " << name << " " << exe << endl;
+
+    return 0;
 }
