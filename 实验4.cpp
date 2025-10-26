@@ -71,6 +71,60 @@ Status Undo_LinkedStack(LinkedStack mainStack, LinkedStack historyStack)
     return OK;
 }
 
+Status ModifyEXE(LinkedStack S, int detla, Elemtype targetNum)
+{
+    if (!S|| LinkedStack_Empty(S))
+    {
+        return ERROR;
+    }
+    LinkedStackNode* p = S->next;
+    while (p != nullptr)
+    {
+        if (p->Num == targetNum)
+        {
+            p->EXE += detla;
+            return OK;
+        }
+        p - p->next;
+    }
+
+}
+
+Status DeModifyEXE(LinkedStack S, int detla, Elemtype targetNum)
+{
+    if (!S || LinkedStack_Empty(S))
+    {
+        return ERROR;
+    }
+    LinkedStackNode* p = S->next;
+    while (p != nullptr)
+    {
+        if (p->Num == targetNum)
+        {
+            p->EXE -= detla;
+            return OK;
+        }
+        p - p->next;
+    }
+
+}
+
+void PrintStack(LinkedStack stack)
+{
+    if (LinkedStack_Empty(stack) == OK)
+    {
+        cout << "栈为空" << endl;
+        return;
+    }
+
+    LinkedStackNode* p = stack->next;
+    while (p != nullptr)
+    {
+        cout << p->Num << p->Name <<  p->EXE << endl;
+        p = p->next;
+    }
+}
+
 int main()
 {
     LinkedStack S = Init_LinkedStack();
@@ -104,18 +158,46 @@ int main()
     cout << "3.撤揄加减经验值的错误操作" << endl;
 
     int choose = -1;
+    cin >> choose;
+    int delta;
+    Elemtype targetNum;
     while(choose!=0)
     {
         cout << "请选择进行的操作：";
         switch (choose)
         {
         case 1:
-
+            cout << "请输入目标学号：";
+            cin >> targetNum;
+            cout << "请输入要增加的经验值：";
+            cin >> delta;
+            if (ModifyEXE(S, num, exe) == OK)
+                cout << "\n修改成功：学号"<<num<<"增加" << exe<<"经验" << endl;
+            else
+            {
+                cout << "\n修改失败：未找到学号" << num << endl;
+                PrintStack(S);
+            }
+            break;
+        case 2:
+            cout << "请输入目标学号：";
+            cin >> targetNum;
+            cout << "请输入要减少的经验值：";
+            cin >> delta;
+            if (DeModifyEXE(S, num, exe) == OK)
+                cout << "\n修改成功：学号" << num << "减少" << exe << "经验" << endl;
+            else
+            {
+                cout << "\n修改失败：未找到学号" << num << endl;
+                PrintStack(S);
+            }
+                
+            break;
+        case 3:
+            Undo_LinkedStack(S, S);
+            PrintStack(S);
             break;
         }
     }
-        
-
-
     return 0;
 }
