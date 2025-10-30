@@ -48,7 +48,7 @@ Status ListInsert(Sqlist L, int i, ElemType e)
 {
 	if (i<1 || i>L.length + 1)return ERROR;
 	if (L.length == MAXSIZE)return ERROR;
-	for (int j = L.length - 1; j >= i-1; --j)1
+	for (int j = L.length - 1; j >= i-1; --j)
 	{
 		L.elem[j + 1] = L.elem[j];
 	}
