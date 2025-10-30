@@ -21,5 +21,8 @@
     <ClCompile Include="实验4.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="集合差集运算.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
