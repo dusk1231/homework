@@ -18,7 +18,7 @@ Status InitLNode(Sqlist& L)
 	L.elem = new ElemType[MAXSIZE];
 	if (!L.elem)
 		return ERROR;
-	L.elem = nullptr;
+	L.length = 0;
 	return OK;
 }
 
@@ -32,9 +32,9 @@ Status GetElem(Sqlist L,int i,ElemType e)
 	return OK;
 }
 
-Status LocateElem(Sqlist L,int i, ElemType e)
+Status LocateElem(Sqlist L,ElemType e)
 {
-	for (i = 0; i <= L.length; i++)
+	for (int i = 0; i <= L.length; i++)
 	{
 		if (L.elem[i - 1] == e)
 		{
@@ -47,8 +47,8 @@ Status LocateElem(Sqlist L,int i, ElemType e)
 Status ListInsert(Sqlist L, int i, ElemType e)
 {
 	if (i<1 || i>L.length + 1)return ERROR;
-	if (L.length >= MAXSIZE)return ERROR;
-	for (int j = L.length - 1; j <= i; --j)
+	if (L.length == MAXSIZE)return ERROR;
+	for (int j = L.length - 1; j >= i-1; --j)1
 	{
 		L.elem[j + 1] = L.elem[j];
 	}
@@ -57,3 +57,8 @@ Status ListInsert(Sqlist L, int i, ElemType e)
 	return OK;
 }
 
+Status InsertNoDuplicate(Sqlist L, ElemType e)
+{
+	if (LocateElem(L, e) != 0)return ERROR;
+	return ListInsert(L, L.length+1, e);
+}
